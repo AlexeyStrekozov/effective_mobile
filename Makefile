@@ -13,7 +13,8 @@ env-cleanup:
 	@read -p "Clear all environment files? Risk of data loss. [y/N]: " ans; \
 	if [ "$$ans" = "y" ]; then \
 		docker compose down effective_mobile-postgres port-forwarder && \
-		rm -rf {PROJECT_ROOT}/out/pgdata && \
+		docker compose down port-forwarder && \
+		rm -rf {PROJECT_ROOT}/out && \
 		echo "Environment files have been cleared"; \
 	else \
 		echo "Cleaning up the environment of the canceled"; \
