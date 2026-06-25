@@ -1,0 +1,306 @@
+definitions:
+  core_http_response.ErrorResponse:
+    properties:
+      error:
+        type: string
+      messages:
+        type: string
+    type: object
+  statistics_transport_http.GetStatisticsResponse:
+    properties:
+      total_cost:
+        type: integer
+    type: object
+  subscriptions_transport_http.CreateSubscriptionRequest:
+    properties:
+      end_date:
+        example: "2026-07-15"
+        type: string
+      price:
+        type: integer
+      service_name:
+        type: string
+      start_date:
+        example: "2025-07-15"
+        type: string
+      user_id:
+        type: string
+    type: object
+  subscriptions_transport_http.CreateSubscriptionResponse:
+    properties:
+      end_date:
+        example: "2026-07-15"
+        type: string
+      id:
+        type: integer
+      price:
+        type: integer
+      service_name:
+        type: string
+      start_date:
+        example: "2025-07-15"
+        type: string
+      user_id:
+        type: string
+    type: object
+  subscriptions_transport_http.GetSubscriptionResponse:
+    properties:
+      end_date:
+        example: "2026-07-15"
+        type: string
+      id:
+        type: integer
+      price:
+        type: integer
+      service_name:
+        type: string
+      start_date:
+        example: "2025-07-15"
+        type: string
+      user_id:
+        type: string
+    type: object
+  subscriptions_transport_http.SubscriptionDTOResponse:
+    properties:
+      end_date:
+        example: "2026-07-15"
+        type: string
+      id:
+        type: integer
+      price:
+        type: integer
+      service_name:
+        type: string
+      start_date:
+        example: "2025-07-15"
+        type: string
+      user_id:
+        type: string
+    type: object
+  subscriptions_transport_http.UpdateSubscriptionRequest:
+    type: object
+  subscriptions_transport_http.UpdateSubscriptionResponse:
+    properties:
+      end_date:
+        example: "2026-07-15"
+        type: string
+      id:
+        type: integer
+      price:
+        type: integer
+      service_name:
+        type: string
+      start_date:
+        example: "2025-07-15"
+        type: string
+      user_id:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /api/v1/statistics:
+    get:
+      description: Подсчёт суммарной стоимости подписок за выбранный период с фильтрацией
+        по пользователю и названию сервиса
+      parameters:
+      - description: Фильтрация по UUID пользователя
+        in: query
+        name: user_id
+        type: string
+      - description: Фильтрация по названию сервиса
+        in: query
+        name: service_name
+        type: string
+      - description: 'Начало периода (включительно), формат: MM-YYYY'
+        in: query
+        name: from
+        type: string
+      - description: 'Конец периода (не включительно), формат: MM-YYYY'
+        in: query
+        name: to
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Суммарная стоимость
+          schema:
+            $ref: '#/definitions/statistics_transport_http.GetStatisticsResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/core_http_response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/core_http_response.ErrorResponse'
+      summary: Суммарная стоимость подписок
+      tags:
+      - statistics
+  /api/v1/subscriptions:
+    get:
+      description: Список подписок с опциональной пагинацией и/или фильтрацией по
+        user_id
+      parameters:
+      - description: Фильтрация по UUID пользователя
+        in: query
+        name: user_id
+        type: string
+      - description: Размер страницы
+        in: query
+        name: limit
+        type: integer
+      - description: Смещение
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Список подписок
+          schema:
+            items:
+              $ref: '#/definitions/subscriptions_transport_http.SubscriptionDTOResponse'
+            type: array
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/core_http_response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/core_http_response.ErrorResponse'
+      summary: Список подписок
+      tags:
+      - subscriptions
+    post:
+      consumes:
+      - application/json
+      description: Создать новую запись о подписке
+      parameters:
+      - description: Тело запроса
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/subscriptions_transport_http.CreateSubscriptionRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Успешно созданная подписка
+          schema:
+            $ref: '#/definitions/subscriptions_transport_http.CreateSubscriptionResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/core_http_response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/core_http_response.ErrorResponse'
+      summary: Создать подписку
+      tags:
+      - subscriptions
+  /api/v1/subscriptions/{id}:
+    delete:
+      description: Удалить запись о подписке по её ID
+      parameters:
+      - description: ID подписки
+        format: int
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: Успешное удаление
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/core_http_response.ErrorResponse'
+        "404":
+          description: Not found
+          schema:
+            $ref: '#/definitions/core_http_response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/core_http_response.ErrorResponse'
+      summary: Удалить подписку
+      tags:
+      - subscriptions
+    get:
+      description: Получение конкретной подписки по её ID
+      parameters:
+      - description: ID подписки
+        format: int
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Подписка найдена
+          schema:
+            $ref: '#/definitions/subscriptions_transport_http.GetSubscriptionResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/core_http_response.ErrorResponse'
+        "404":
+          description: Not found
+          schema:
+            $ref: '#/definitions/core_http_response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/core_http_response.ErrorResponse'
+      summary: Получить подписку
+      tags:
+      - subscriptions
+    patch:
+      consumes:
+      - application/json
+      description: Частичное обновление записи о подписке (PATCH). Поля не переданные
+        в теле — не изменяются. end_date можно сбросить, передав null.
+      parameters:
+      - description: ID подписки
+        format: int
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Тело запроса
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/subscriptions_transport_http.UpdateSubscriptionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Обновлённая подписка
+          schema:
+            $ref: '#/definitions/subscriptions_transport_http.UpdateSubscriptionResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/core_http_response.ErrorResponse'
+        "404":
+          description: Not found
+          schema:
+            $ref: '#/definitions/core_http_response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/core_http_response.ErrorResponse'
+      summary: Обновить подписку
+      tags:
+      - subscriptions
+swagger: "2.0"
