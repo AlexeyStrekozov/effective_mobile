@@ -33,3 +33,11 @@ Effective Mobile
 “start_date”: “07-2025”
 }
 ```# effective_mobile
+
+
+# Run dev
+1. You need craete .env file
+2. make env-up
+3. make env-port-forward
+4. make migrate-up
+5. make dev-run
